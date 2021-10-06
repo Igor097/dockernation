@@ -23,7 +23,7 @@ jobs:
       id: buildnumber
       uses: einaregilsson/build-number@v3
       with:
-        token: ${{ secrets.github_token }}
+        token: ${{ secrets.GHUB_TOKEN }}
 
     - name: Checkout repo
       if: github.event_name == 'push'
