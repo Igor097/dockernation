@@ -1,0 +1,53 @@
+name: 'Elixir docker'
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - elixir-container/**
+
+jobs:
+  container:
+    name: 'Elixir'
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: elixir-container
+        shell: bash
+
+    steps:
+    - if: github.event_name == 'push'
+      name: Generate build number
+      id: buildnumber
+      uses: einaregilsson/build-number@v3
+      with:
+        token: ${{ secrets.github_token }}
+
+    - name: Checkout repo
+      if: github.event_name == 'push'
+      uses: actions/checkout@v2
+
+    - name: Login to Dockerhub
+      if: github.event_name == 'push'
+      uses: docker/login-actions@v1
+      with:
+        username: ${{ secrets.dockerhub_username }}
+        password: ${{ secrets.dockerhub_token }}
+
+    - name: Setup docker buildx
+      if: github.event_name == 'push'
+      id: buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Build and push
+      if: github.event_name == 'push'
+      id: docker_build
+      uses: docker/build-push-action@v2
+      with:
+        context: ./elixir-container
+        file: ./elixir-container/Dockefile
+        push: true
+        tags: ${{ secrets.dockerhub_username }}/elixir:${{ steps.buildnumber.outputs.build_number }}
+
