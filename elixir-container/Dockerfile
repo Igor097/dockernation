@@ -1,5 +1,5 @@
 ARG ALPINE_VERSION=latest
-FROM alpine:latest
+FROM alpine:${ALPINE_VERSION}
 
 LABEL maintainer="Madtuxx"
 
